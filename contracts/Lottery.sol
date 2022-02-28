@@ -24,6 +24,7 @@ contract Lottery is VRFConsumerBase, Ownable {
     LOTTERY_STATE public lottery_state;
     uint256 public fee;
     bytes32 public keyhash;
+    event RequestedRandomness(bytes32 requestId);
 
     // 0
     // 1
@@ -33,6 +34,7 @@ contract Lottery is VRFConsumerBase, Ownable {
         address _priceFeedAddress,
         address _vrfCoordinator,
         address _link,
+        // values are done in brownie.config
         uint256 _fee,
         bytes32 _keyhash
     ) public VRFConsumerBase(_vrfCoordinator, _link) {
@@ -95,7 +97,8 @@ contract Lottery is VRFConsumerBase, Ownable {
         //     )
         // ) % players.length;
         lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
-        requestRandomness(keyhash, fee);
+        bytes32 requestId = requestRandomness(keyhash, fee);
+        emit RequestedRandomness(requestId);
     }
 
     function fulfillRandomness(bytes32 _requestId, uint256 _randomness)
